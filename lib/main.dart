@@ -31,13 +31,11 @@ class TodoListState extends State<TodoList> {
   List<String> _todoItems = [];
 
   // This will be called each time the + FAB is pressed
-  void _addTodoItem() {
-    // Putting our code inside "setState" tells the app that
-    // our state has changed, and it will automatically re-render the list
-    setState(() {
-      int index = _todoItems.length;
-      _todoItems.add('Item ' + index.toString());
-    });
+  void _addTodoItem(String task) {
+    // Only add the task if the user actually entered something
+    if(task.length > 0) {
+      setState(() => _todoItems.add(task));
+    }
   }
 
   // Build the whole list of todo_items
@@ -62,6 +60,34 @@ class TodoListState extends State<TodoList> {
     );
   }
 
+  void _pushAddTodoScreen() {
+    // Push this page onto the stack
+    Navigator.of(context).push(
+      // MaterialPageRoute will automatically animate the screen entry, as well
+      // as adding a back button to close it
+      new MaterialPageRoute(
+        builder: (context) {
+          return new Scaffold(
+            appBar: new AppBar(
+              title: new Text('Add a new task')
+            ),
+            body: new TextField(
+              autofocus: true,
+              onSubmitted: (val) {
+                _addTodoItem(val);
+                Navigator.pop(context); // Close the add todo_screen
+              },
+              decoration: new InputDecoration(
+                hintText: 'Enter something to do...',
+                contentPadding: const EdgeInsets.all(16.0)
+              ),
+            )
+          );
+        }
+      )
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -70,7 +96,7 @@ class TodoListState extends State<TodoList> {
       ),
       body: _buildTodoList(),
       floatingActionButton: new FloatingActionButton(
-        onPressed: _addTodoItem,
+        onPressed: _pushAddTodoScreen,
         tooltip: 'Add task',
         child: new Icon(Icons.add),
       ),
